@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fs::read_to_string;
 use std::ops::Add;
@@ -285,6 +287,210 @@ pub fn d11_p2() {
         .iter()
         .map(|x| convert_to_p2_repr(x))
         .collect();
-    //simulate_monkey_actions_p2(&mut monkeys_states_p2, 2);
     simulate_monkey_actions_p2(&mut monkeys_states_p2, 10000);
+}
+
+#[derive(Debug)]
+struct HeightMapInfo {
+    map: Vec<Vec<u8>>,
+    start_x: usize,
+    start_y: usize,
+    end_x: usize,
+    end_y: usize,
+}
+
+fn parse_height_map(in_content: &str) -> HeightMapInfo {
+    let mut parsed_map: Vec<Vec<u8>> = Vec::new();
+    let mut start_pos: (usize, usize) = (0, 0);
+    let mut end_pos: (usize, usize) = (0, 0);
+    for (i, cur_line) in in_content.lines().enumerate() {
+        parsed_map.push(Vec::new());
+        for (j, cur_char) in cur_line.bytes().enumerate() {
+            if cur_char == b'S' {
+                parsed_map[i].push(b'a');
+                start_pos = (i, j);
+            } else if cur_char == b'E' {
+                parsed_map[i].push(b'z');
+                end_pos = (i, j);
+            } else {
+                parsed_map[i].push(cur_char);
+            }
+        }
+    }
+    HeightMapInfo {
+        map: parsed_map,
+        start_x: start_pos.0,
+        start_y: start_pos.1,
+        end_x: end_pos.0,
+        end_y: end_pos.1,
+    }
+}
+
+fn get_p1_valid_neighbors(
+    in_map_info: &HeightMapInfo,
+    in_pos: (usize, usize),
+) -> Vec<(usize, usize)> {
+    let mut valid_neighbors: Vec<(usize, usize)> = Vec::new();
+    if in_pos.1 != 0
+        && in_map_info.map[in_pos.0][in_pos.1 - 1] <= in_map_info.map[in_pos.0][in_pos.1]
+    {
+        valid_neighbors.push((in_pos.0, in_pos.1 - 1));
+    }
+    if in_pos.0 != 0
+        && in_map_info.map[in_pos.0 - 1][in_pos.1] <= in_map_info.map[in_pos.0][in_pos.1]
+    {
+        valid_neighbors.push((in_pos.0 - 1, in_pos.1));
+    }
+    if in_pos.0 != in_map_info.map.len() - 1
+        && in_map_info.map[in_pos.0 + 1][in_pos.1] <= in_map_info.map[in_pos.0][in_pos.1]
+    {
+        valid_neighbors.push((in_pos.0 + 1, in_pos.1));
+    }
+    if in_pos.1 != in_map_info.map[0].len() - 1
+        && in_map_info.map[in_pos.0][in_pos.1 + 1] <= in_map_info.map[in_pos.0][in_pos.1]
+    {
+        valid_neighbors.push((in_pos.0, in_pos.1 + 1));
+    }
+    if in_pos.1 != 0
+        && in_map_info.map[in_pos.0][in_pos.1 - 1] > in_map_info.map[in_pos.0][in_pos.1]
+    {
+        if (in_map_info.map[in_pos.0][in_pos.1 - 1] - in_map_info.map[in_pos.0][in_pos.1]) <= 1 {
+            valid_neighbors.push((in_pos.0, in_pos.1 - 1));
+        }
+    }
+    if in_pos.0 != 0
+        && in_map_info.map[in_pos.0 - 1][in_pos.1] > in_map_info.map[in_pos.0][in_pos.1]
+    {
+        if (in_map_info.map[in_pos.0 - 1][in_pos.1] - in_map_info.map[in_pos.0][in_pos.1]) <= 1 {
+            valid_neighbors.push((in_pos.0 - 1, in_pos.1));
+        }
+    }
+    if in_pos.0 != in_map_info.map.len() - 1
+        && in_map_info.map[in_pos.0 + 1][in_pos.1] > in_map_info.map[in_pos.0][in_pos.1]
+    {
+        if (in_map_info.map[in_pos.0 + 1][in_pos.1] - in_map_info.map[in_pos.0][in_pos.1]) <= 1 {
+            valid_neighbors.push((in_pos.0 + 1, in_pos.1));
+        }
+    }
+    if in_pos.1 != in_map_info.map[0].len() - 1
+        && in_map_info.map[in_pos.0][in_pos.1 + 1] > in_map_info.map[in_pos.0][in_pos.1]
+    {
+        if (in_map_info.map[in_pos.0][in_pos.1 + 1] - in_map_info.map[in_pos.0][in_pos.1]) <= 1 {
+            valid_neighbors.push((in_pos.0, in_pos.1 + 1));
+        }
+    }
+    valid_neighbors
+    //vec![valid_neighbors
+    //    .iter()
+    //    .map(|x| (x, in_map_info.map[x.0][x.1]))
+    //    .max_by(|&x, &y| y.1.cmp(&x.1))
+    //    .map(|x| x.0)
+    //    .unwrap()
+    //    .clone()]
+}
+
+fn get_p1_nr_of_steps(in_map_info: &HeightMapInfo) -> u32 {
+    let mut visited_set: BTreeSet<(usize, usize)> = BTreeSet::new();
+    let mut next_visit_deque: VecDeque<(usize, usize, u32, BTreeSet<(usize, usize)>)> =
+        VecDeque::new();
+    let mut has_reached_to_target = false;
+    let mut path_length = None;
+    next_visit_deque.push_back((
+        in_map_info.start_x,
+        in_map_info.start_y,
+        0,
+        BTreeSet::from_iter(vec![(in_map_info.start_x, in_map_info.start_y)].into_iter()),
+    ));
+    while !has_reached_to_target && !next_visit_deque.is_empty() {
+        //let cur_node = next_visit_deque.pop_front().unwrap();
+        let cur_node = next_visit_deque.pop_back().unwrap();
+        //println!("Inspecting: {:?}", cur_node);
+        visited_set.insert((cur_node.0, cur_node.1));
+        if cur_node.0 == in_map_info.end_x && cur_node.1 == in_map_info.end_y {
+            if path_length.is_none() || cur_node.2 < path_length.unwrap() {
+                path_length = Some(cur_node.2);
+            }
+        } else {
+            let mut valid_neighbors =
+                get_p1_valid_neighbors(&in_map_info, (cur_node.0, cur_node.1));
+            let mut next_targets: VecDeque<(usize, usize, u32, BTreeSet<(usize, usize)>)> =
+                valid_neighbors
+                    .iter()
+                    //.filter(|x| !visited_set.contains(&x))
+                    .filter(|x| {
+                        let mut long_path = false;
+                        if let Some(val) = path_length {
+                            if val < cur_node.3.len() as u32 {
+                                long_path = true
+                            }
+                        }
+                        !cur_node.3.contains(&x) && !long_path
+                    })
+                    .map(|&x| {
+                        let mut path = cur_node.3.clone();
+                        path.insert((x.0, x.1));
+                        (x.0, x.1, cur_node.2 + 1, path)
+                    })
+                    .collect();
+            next_visit_deque.append(&mut next_targets);
+        }
+    }
+    //println!("path: {:?}", found_path);
+    path_length.unwrap()
+}
+
+fn one_hop_targets(
+    in_map_info: &HeightMapInfo,
+    in_pos: (usize, usize),
+    target_char: u8,
+) -> Vec<((usize, usize), (usize, usize))> {
+    let mut valid_neighbors: Vec<((usize, usize), (usize, usize))> = Vec::new();
+    if in_pos.1 != 0 && in_map_info.map[in_pos.0][in_pos.1 - 1] == target_char {
+        valid_neighbors.push((in_pos, (in_pos.0, in_pos.1 - 1)));
+    }
+    if in_pos.0 != 0 && in_map_info.map[in_pos.0 - 1][in_pos.1] == target_char {
+        valid_neighbors.push((in_pos, (in_pos.0 - 1, in_pos.1)));
+    }
+    if in_pos.0 != in_map_info.map.len() - 1
+        && in_map_info.map[in_pos.0 + 1][in_pos.1] == target_char
+    {
+        valid_neighbors.push((in_pos, (in_pos.0 + 1, in_pos.1)));
+    }
+    if in_pos.1 != in_map_info.map[0].len() - 1
+        && in_map_info.map[in_pos.0][in_pos.1 + 1] == target_char
+    {
+        valid_neighbors.push((in_pos, (in_pos.0, in_pos.1 + 1)));
+    }
+    valid_neighbors
+}
+
+fn necessary_subpaths(map_info: &HeightMapInfo) -> Vec<Vec<((usize, usize), (usize, usize))>> {
+    let mut found_necessary_paths: Vec<Vec<((usize, usize), (usize, usize))>> = Vec::new();
+    for from_char in b'a'..b'y' {
+        let mut paths_from_this_char: Vec<((usize, usize), (usize, usize))> = Vec::new();
+        for (i, cur_row) in map_info.map.iter().enumerate() {
+            for (j, &cur_char) in cur_row.iter().enumerate() {
+                if cur_char == from_char {
+                    let mut cur_targets = one_hop_targets(&map_info, (i, j), from_char + 1);
+                    paths_from_this_char.append(&mut cur_targets);
+                }
+            }
+        }
+        println!(
+            "For {}, necessary paths: {:?}",
+            from_char as char, paths_from_this_char
+        );
+        found_necessary_paths.push(paths_from_this_char);
+    }
+
+    return found_necessary_paths;
+}
+
+pub fn d12_p1() {
+    //let in_content = std::fs::read_to_string("./in/d12p1/tmp_in0").unwrap();
+    let in_content = std::fs::read_to_string("./in/d12p1/input").unwrap();
+    let map_info = parse_height_map(&in_content);
+    let suppaths = necessary_subpaths(&map_info);
+    //let path_length = get_p1_nr_of_steps(&map_info);
+    //println!("path length: {}", path_length);
 }
