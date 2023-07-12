@@ -326,23 +326,15 @@ fn parse_height_map(in_content: &str) -> HeightMapInfo {
     }
 }
 
-fn get_p1_valid_neighbors(
-    in_map: &Vec<Vec<u8>>,
-    in_pos: (usize, usize),
-) -> Vec<(usize, usize)> {
+fn get_p1_valid_neighbors(in_map: &Vec<Vec<u8>>, in_pos: (usize, usize)) -> Vec<(usize, usize)> {
     let mut valid_neighbors: Vec<(usize, usize)> = Vec::new();
-    if in_pos.1 != 0
-        && in_map[in_pos.0][in_pos.1 - 1] <= in_map[in_pos.0][in_pos.1]
-    {
+    if in_pos.1 != 0 && in_map[in_pos.0][in_pos.1 - 1] <= in_map[in_pos.0][in_pos.1] {
         valid_neighbors.push((in_pos.0, in_pos.1 - 1));
     }
-    if in_pos.0 != 0
-        && in_map[in_pos.0 - 1][in_pos.1] <= in_map[in_pos.0][in_pos.1]
-    {
+    if in_pos.0 != 0 && in_map[in_pos.0 - 1][in_pos.1] <= in_map[in_pos.0][in_pos.1] {
         valid_neighbors.push((in_pos.0 - 1, in_pos.1));
     }
-    if in_pos.0 != in_map.len() - 1
-        && in_map[in_pos.0 + 1][in_pos.1] <= in_map[in_pos.0][in_pos.1]
+    if in_pos.0 != in_map.len() - 1 && in_map[in_pos.0 + 1][in_pos.1] <= in_map[in_pos.0][in_pos.1]
     {
         valid_neighbors.push((in_pos.0 + 1, in_pos.1));
     }
@@ -351,23 +343,17 @@ fn get_p1_valid_neighbors(
     {
         valid_neighbors.push((in_pos.0, in_pos.1 + 1));
     }
-    if in_pos.1 != 0
-        && in_map[in_pos.0][in_pos.1 - 1] > in_map[in_pos.0][in_pos.1]
-    {
+    if in_pos.1 != 0 && in_map[in_pos.0][in_pos.1 - 1] > in_map[in_pos.0][in_pos.1] {
         if (in_map[in_pos.0][in_pos.1 - 1] - in_map[in_pos.0][in_pos.1]) <= 1 {
             valid_neighbors.push((in_pos.0, in_pos.1 - 1));
         }
     }
-    if in_pos.0 != 0
-        && in_map[in_pos.0 - 1][in_pos.1] > in_map[in_pos.0][in_pos.1]
-    {
+    if in_pos.0 != 0 && in_map[in_pos.0 - 1][in_pos.1] > in_map[in_pos.0][in_pos.1] {
         if (in_map[in_pos.0 - 1][in_pos.1] - in_map[in_pos.0][in_pos.1]) <= 1 {
             valid_neighbors.push((in_pos.0 - 1, in_pos.1));
         }
     }
-    if in_pos.0 != in_map.len() - 1
-        && in_map[in_pos.0 + 1][in_pos.1] > in_map[in_pos.0][in_pos.1]
-    {
+    if in_pos.0 != in_map.len() - 1 && in_map[in_pos.0 + 1][in_pos.1] > in_map[in_pos.0][in_pos.1] {
         if (in_map[in_pos.0 + 1][in_pos.1] - in_map[in_pos.0][in_pos.1]) <= 1 {
             valid_neighbors.push((in_pos.0 + 1, in_pos.1));
         }
@@ -393,14 +379,10 @@ fn get_p1_nr_of_steps(in_map_info: &HeightMapInfo) -> Option<u32> {
     let mut visited_set: BTreeSet<(usize, usize)> = BTreeSet::new();
     //let mut next_visit_deque: VecDeque<(usize, usize, u32, BTreeSet<(usize, usize)>)> =
     //    VecDeque::new();
-    let mut next_visit_deque: VecDeque<(usize,usize,u32)> = VecDeque::new();
+    let mut next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
     let mut has_reached_to_target = false;
     let mut path_length = None;
-    next_visit_deque.push_back((
-        in_map_info.start_x,
-        in_map_info.start_y,
-        0
-    ));
+    next_visit_deque.push_back((in_map_info.start_x, in_map_info.start_y, 0));
     while !has_reached_to_target && !next_visit_deque.is_empty() {
         let cur_node = next_visit_deque.pop_front().unwrap();
         //let cur_node = next_visit_deque.pop_back().unwrap();
@@ -412,30 +394,29 @@ fn get_p1_nr_of_steps(in_map_info: &HeightMapInfo) -> Option<u32> {
         } else {
             let valid_neighbors =
                 get_p1_valid_neighbors(&in_map_info.map, (cur_node.0, cur_node.1));
-            let mut next_targets: VecDeque<(usize, usize, u32)> =
-                valid_neighbors
-                    .iter()
-                    .filter(|x| !visited_set.contains(&x))
-                    //.filter(|x| {
-                    //    let mut long_path = false;
-                    //    if let Some(val) = path_length {
-                    //        if val < cur_node.3.len() as u32 {
-                    //            long_path = true
-                    //        }
-                    //    }
-                    //    !cur_node.3.contains(&x) && !long_path
-                    //})
-                    //.map(|&x| {
-                    //    let mut path = cur_node.3.clone();
-                    //    path.insert((x.0, x.1));
-                    //    (x.0, x.1, cur_node.2 + 1, path)
-                    //})
-                    .map(|&x| (x.0, x.1, cur_node.2+1))
-                    .collect();
+            let mut next_targets: VecDeque<(usize, usize, u32)> = valid_neighbors
+                .iter()
+                .filter(|x| !visited_set.contains(&x))
+                //.filter(|x| {
+                //    let mut long_path = false;
+                //    if let Some(val) = path_length {
+                //        if val < cur_node.3.len() as u32 {
+                //            long_path = true
+                //        }
+                //    }
+                //    !cur_node.3.contains(&x) && !long_path
+                //})
+                //.map(|&x| {
+                //    let mut path = cur_node.3.clone();
+                //    path.insert((x.0, x.1));
+                //    (x.0, x.1, cur_node.2 + 1, path)
+                //})
+                .map(|&x| (x.0, x.1, cur_node.2 + 1))
+                .collect();
             next_visit_deque.append(&mut next_targets);
             const VEC_LIMIT: usize = 100000000;
-            let mut pruned_next_visit_deque: VecDeque<(usize,usize,u32)> = VecDeque::new();
-            if next_visit_deque.len() > VEC_LIMIT{
+            let mut pruned_next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
+            if next_visit_deque.len() > VEC_LIMIT {
                 panic!("next visit dequeue has more than {} elements", VEC_LIMIT);
             }
             for next_visit_node in next_visit_deque {
@@ -450,18 +431,20 @@ fn get_p1_nr_of_steps(in_map_info: &HeightMapInfo) -> Option<u32> {
     path_length
 }
 
-fn p1_nr_of_steps(map: &Vec<Vec<u8>>, start_x: usize, start_y: usize, end_x: usize, end_y: usize) -> Option<u32> {
+fn p1_nr_of_steps(
+    map: &Vec<Vec<u8>>,
+    start_x: usize,
+    start_y: usize,
+    end_x: usize,
+    end_y: usize,
+) -> Option<u32> {
     let mut visited_set: BTreeSet<(usize, usize)> = BTreeSet::new();
     //let mut next_visit_deque: VecDeque<(usize, usize, u32, BTreeSet<(usize, usize)>)> =
     //    VecDeque::new();
-    let mut next_visit_deque: VecDeque<(usize,usize,u32)> = VecDeque::new();
+    let mut next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
     let mut has_reached_to_target = false;
     let mut path_length = None;
-    next_visit_deque.push_back((
-        start_x,
-        start_y,
-        0
-    ));
+    next_visit_deque.push_back((start_x, start_y, 0));
     while !has_reached_to_target && !next_visit_deque.is_empty() {
         let cur_node = next_visit_deque.pop_front().unwrap();
         //let cur_node = next_visit_deque.pop_back().unwrap();
@@ -471,31 +454,29 @@ fn p1_nr_of_steps(map: &Vec<Vec<u8>>, start_x: usize, start_y: usize, end_x: usi
             path_length = Some(cur_node.2);
             has_reached_to_target = true;
         } else {
-            let mut valid_neighbors =
-                get_p1_valid_neighbors(&map, (cur_node.0, cur_node.1));
-            let mut next_targets: VecDeque<(usize, usize, u32)> =
-                valid_neighbors
-                    .iter()
-                    .filter(|x| !visited_set.contains(&x))
-                    //.filter(|x| {
-                    //    let mut long_path = false;
-                    //    if let Some(val) = path_length {
-                    //        if val < cur_node.3.len() as u32 {
-                    //            long_path = true
-                    //        }
-                    //    }
-                    //    !cur_node.3.contains(&x) && !long_path
-                    //})
-                    //.map(|&x| {
-                    //    let mut path = cur_node.3.clone();
-                    //    path.insert((x.0, x.1));
-                    //    (x.0, x.1, cur_node.2 + 1, path)
-                    //})
-                    .map(|&x| (x.0, x.1, cur_node.2+1))
-                    .collect();
+            let mut valid_neighbors = get_p1_valid_neighbors(&map, (cur_node.0, cur_node.1));
+            let mut next_targets: VecDeque<(usize, usize, u32)> = valid_neighbors
+                .iter()
+                .filter(|x| !visited_set.contains(&x))
+                //.filter(|x| {
+                //    let mut long_path = false;
+                //    if let Some(val) = path_length {
+                //        if val < cur_node.3.len() as u32 {
+                //            long_path = true
+                //        }
+                //    }
+                //    !cur_node.3.contains(&x) && !long_path
+                //})
+                //.map(|&x| {
+                //    let mut path = cur_node.3.clone();
+                //    path.insert((x.0, x.1));
+                //    (x.0, x.1, cur_node.2 + 1, path)
+                //})
+                .map(|&x| (x.0, x.1, cur_node.2 + 1))
+                .collect();
             next_visit_deque.append(&mut next_targets);
             const VEC_LIMIT: usize = 10000000;
-            if next_visit_deque.len() > VEC_LIMIT{
+            if next_visit_deque.len() > VEC_LIMIT {
                 panic!("next visit dequeue has more than {} elements", VEC_LIMIT);
             }
             let mut pruned_next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
@@ -557,28 +538,31 @@ fn necessary_subpaths(map_info: &HeightMapInfo) -> Vec<Vec<((usize, usize), (usi
     return found_necessary_paths;
 }
 
-fn is_around(loc1: (usize, usize), loc2: (usize,usize)) -> bool {
+fn is_around(loc1: (usize, usize), loc2: (usize, usize)) -> bool {
     if loc1.0 == loc2.0 {
         if loc1.1 == loc2.1 {
             return true;
         }
-        if loc1.1 != 0 && loc1.1-1 == loc2.1{
+        if loc1.1 != 0 && loc1.1 - 1 == loc2.1 {
             return true;
-        } else if loc1.1 +1 == loc2.1 {
+        } else if loc1.1 + 1 == loc2.1 {
             return true;
         }
     }
     if loc1.1 == loc2.1 {
-        if loc1.0 !=0 && loc1.0-1 == loc2.0 {
+        if loc1.0 != 0 && loc1.0 - 1 == loc2.0 {
             return true;
-        } else if loc1.0 +1 == loc2.0 {
+        } else if loc1.0 + 1 == loc2.0 {
             return true;
         }
     }
     false
 }
 
-fn path_from_subpaths(map_info: &HeightMapInfo, subpaths: &Vec<Vec<((usize,usize),(usize,usize))>>) {
+fn path_from_subpaths(
+    map_info: &HeightMapInfo,
+    subpaths: &Vec<Vec<((usize, usize), (usize, usize))>>,
+) {
     //let mut subpath_lengths: Vec<Vec<Vec<Option<u32>>>> = Vec::new();
     //for same_height_subpaths_ind in 0..subpaths.len()-1 {
     //    let from_subpaths = &subpaths[same_height_subpaths_ind];
@@ -597,32 +581,50 @@ fn path_from_subpaths(map_info: &HeightMapInfo, subpaths: &Vec<Vec<((usize,usize
     //}
     //println!("Built a 3d path lengts vector");
     let mut found_path_lens: Vec<u32> = Vec::new();
-    let mut subpath_index = vec![0usize;subpaths.len()];
+    let mut subpath_index = vec![0usize; subpaths.len()];
     while let Ok(()) = vec2d_next_index(&subpaths, &mut subpath_index) {
         let first_subpath = &subpaths[0][*subpath_index.first().unwrap()];
-        let last_subpath = &subpaths[subpaths.len()-1][*subpath_index.last().unwrap()];
-        let begin_len = p1_nr_of_steps(&map_info.map, map_info.start_x, map_info.start_y, first_subpath.0.0, first_subpath.0.1);
-        let end_len = p1_nr_of_steps(&map_info.map, last_subpath.1.0, last_subpath.1.1, map_info.end_x, map_info.end_y);
+        let last_subpath = &subpaths[subpaths.len() - 1][*subpath_index.last().unwrap()];
+        let begin_len = p1_nr_of_steps(
+            &map_info.map,
+            map_info.start_x,
+            map_info.start_y,
+            first_subpath.0 .0,
+            first_subpath.0 .1,
+        );
+        let end_len = p1_nr_of_steps(
+            &map_info.map,
+            last_subpath.1 .0,
+            last_subpath.1 .1,
+            map_info.end_x,
+            map_info.end_y,
+        );
         println!("Considering : {:?}", subpath_index);
         if begin_len.is_some() && end_len.is_some() {
             let mut total_len = begin_len.unwrap() + end_len.unwrap();
-            if first_subpath.0.0 != first_subpath.1.0 || first_subpath.0.1 != first_subpath.1.1 {
-                total_len +=1;
+            if first_subpath.0 .0 != first_subpath.1 .0 || first_subpath.0 .1 != first_subpath.1 .1
+            {
+                total_len += 1;
             }
             let mut path_exist = true;
-            for cur_ind in 0..subpaths.len()-1 {
+            for cur_ind in 0..subpaths.len() - 1 {
                 let src_subpath = &subpaths[cur_ind][subpath_index[cur_ind]];
-                let dst_subpath = &subpaths[cur_ind+1][subpath_index[cur_ind+1]];
-                if dst_subpath.0.0 != dst_subpath.1.0 || dst_subpath.0.1 != dst_subpath.1.1 {
-                    total_len +=1;
+                let dst_subpath = &subpaths[cur_ind + 1][subpath_index[cur_ind + 1]];
+                if dst_subpath.0 .0 != dst_subpath.1 .0 || dst_subpath.0 .1 != dst_subpath.1 .1 {
+                    total_len += 1;
                 }
-                let sub_len = p1_nr_of_steps(&map_info.map, src_subpath.1.0, src_subpath.1.1, dst_subpath.0.0, dst_subpath.0.1);
+                let sub_len = p1_nr_of_steps(
+                    &map_info.map,
+                    src_subpath.1 .0,
+                    src_subpath.1 .1,
+                    dst_subpath.0 .0,
+                    dst_subpath.0 .1,
+                );
                 if sub_len.is_none() {
                     path_exist = false;
                     break;
                 }
-                total_len+= sub_len.unwrap();
-
+                total_len += sub_len.unwrap();
             }
             if path_exist {
                 found_path_lens.push(total_len);
@@ -633,8 +635,7 @@ fn path_from_subpaths(map_info: &HeightMapInfo, subpaths: &Vec<Vec<((usize,usize
     println!("Found path lengths: {:?}", found_path_lens);
 }
 
-
-fn vec2d_next_index<T>(in_vec:&Vec<Vec<T>>, index_vec:&mut Vec<usize>) -> Result<(),String>{
+fn vec2d_next_index<T>(in_vec: &Vec<Vec<T>>, index_vec: &mut Vec<usize>) -> Result<(), String> {
     if in_vec.len() != index_vec.len() {
         return Err(String::from("2d vector and index length do not match"));
     }
@@ -645,11 +646,11 @@ fn vec2d_next_index<T>(in_vec:&Vec<Vec<T>>, index_vec:&mut Vec<usize>) -> Result
     }
     let mut carry = 1;
     for i in (0..in_vec.len()).rev() {
-        index_vec[i]+=carry;
+        index_vec[i] += carry;
         if index_vec[i] >= in_vec[i].len() {
             index_vec[i] = 0;
         } else {
-            carry=0;
+            carry = 0;
             break;
         }
     }
@@ -663,10 +664,42 @@ pub fn d12_p1() {
     //let in_content = std::fs::read_to_string("./in/d12p1/tmp_in0").unwrap();
     let in_content = std::fs::read_to_string("./in/d12p1/input").unwrap();
     let map_info = parse_height_map(&in_content);
-    let found_path = p1_nr_of_steps(&map_info.map, map_info.start_x, map_info.start_y, map_info.end_x, map_info.end_y);
-    println!("found path length: {:?}",found_path);
+    let found_path = p1_nr_of_steps(
+        &map_info.map,
+        map_info.start_x,
+        map_info.start_y,
+        map_info.end_x,
+        map_info.end_y,
+    );
+    println!("found path length: {:?}", found_path);
     //let subpaths = necessary_subpaths(&map_info);
     //path_from_subpaths(&map_info, &subpaths);
     //let path_length = get_p1_nr_of_steps(&map_info);
     // println!("path length: {}", path_length);
+}
+
+fn path_len_from_selected_height(map_info: &HeightMapInfo, selected_height: u8) -> Option<u32> {
+    let start_points: Vec<(usize, usize)> = Vec::new();
+    let mut min_path_len = u32::max_value();
+    for i in 0..map_info.map.len() {
+        for j in 0..map_info.map[i].len() {
+            if map_info.map[i][j] == selected_height {
+                let found_path_res =
+                    p1_nr_of_steps(&map_info.map, i, j, map_info.end_x, map_info.end_y);
+                if let Some(found_path_len) = found_path_res {
+                    if found_path_len < min_path_len {
+                        min_path_len = found_path_len;
+                    }
+                }
+            }
+        }
+    }
+    Some(min_path_len)
+}
+
+pub fn d12_p2() {
+    let in_content = std::fs::read_to_string("./in/d12p1/input").unwrap();
+    let map_info = parse_height_map(&in_content);
+    let found_path_len = path_len_from_selected_height(&map_info, b'a');
+    println!("found path length: {:?}", found_path_len);
 }

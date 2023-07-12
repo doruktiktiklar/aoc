@@ -3,5 +3,5 @@
 use doruk_aoc_2022::d11_to_d15::*;
 
 fn main() {
-    d12_p1();
+    d12_p2();
 }
