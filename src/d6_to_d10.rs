@@ -1,5 +1,4 @@
 use std::collections::BTreeSet;
-use std::fs::read_to_string;
 
 pub fn d6_p1() {
     //let in_content = std::fs::read_to_string("./in/d6p1/tmp_in4").unwrap();

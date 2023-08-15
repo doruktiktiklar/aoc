@@ -1,8 +1,7 @@
 use std::collections::BTreeSet;
 use std::collections::BinaryHeap;
-use std::fs::read_to_string;
 use std::fs::File;
-use std::io::{prelude, Read};
+use std::io::Read;
 
 fn read_file_to_string(fname: &str) -> Result<String, std::io::Error> {
     let mut fhandle = File::open(fname)?;
