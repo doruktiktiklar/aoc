@@ -30,8 +30,7 @@ fn get_max_score(in_cals_text: &str) -> u64 {
 }
 
 pub fn d2_p1() {
-    let in_content = std::fs::read_to_string("./in/d2p1/input").unwrap();
-    //let in_content = std::fs::read_to_string("./in/d2p1/tmp_in").unwrap();
+    let in_content = std::fs::read_to_string("./in/d2p1/input").unwrap(); // for testing quickly "./in/d2p1/tmp_in"
     let mut total_score = 0;
     for cur_line in in_content.lines() {
         if (cur_line.chars().nth(0).unwrap() == 'A' && cur_line.chars().nth(2).unwrap() == 'X')
@@ -58,8 +57,7 @@ pub fn d2_p1() {
 }
 
 pub fn d2_p2() {
-    let in_content = std::fs::read_to_string("./in/d2p1/input").unwrap();
-    //let in_content = std::fs::read_to_string("./in/d2p1/tmp_in").unwrap();
+    let in_content = std::fs::read_to_string("./in/d2p1/input").unwrap(); // for testing quickly "./in/d2p1/tmp_in"
     let mut total_score = 0;
     for cur_line in in_content.lines() {
         let my_act_encr = cur_line.chars().nth(2).unwrap();
@@ -106,8 +104,7 @@ fn get_priority(&in_char: &char) -> u32 {
 }
 
 pub fn d3_p1() {
-    let in_content = std::fs::read_to_string("./in/d3p1/input").unwrap();
-    //let in_content = std::fs::read_to_string("./in/d3p1/tmp_in").unwrap();
+    let in_content = std::fs::read_to_string("./in/d3p1/input").unwrap(); // for testing quickly "./in/d3p1/tmp_in"
 
     let mut total_item_priorities = 0;
     for cur_line in in_content.lines() {
@@ -139,8 +136,7 @@ pub fn d3_p1() {
 }
 
 pub fn d3_p2() {
-    let in_content = std::fs::read_to_string("./in/d3p1/input").unwrap();
-    //let in_content = std::fs::read_to_string("./in/d3p1/tmp_in").unwrap();
+    let in_content = std::fs::read_to_string("./in/d3p1/input").unwrap(); // for testing quickly "./in/d3p1/tmp_in"
     enum MEMB {
         FIRST,
         SECOND,
@@ -190,8 +186,7 @@ pub fn d3_p2() {
 }
 
 pub fn d4_p1() {
-    let in_content = std::fs::read_to_string("./in/d4p1/input").unwrap();
-    //let in_content = std::fs::read_to_string("./in/d4p1/tmp_in").unwrap();
+    let in_content = std::fs::read_to_string("./in/d4p1/input").unwrap(); // for testing quickly "./in/d4p1/tmp_in"
 
     let mut nr_of_full_containment = 0;
     for cur_line in in_content.lines() {
@@ -200,10 +195,6 @@ pub fn d4_p1() {
         let second_dash_position = cur_line[first_dash_position + comma_position..]
             .find('-')
             .unwrap();
-        //println!(
-        //    "first dash: {} , comma: {} , second dash: {}",
-        //    first_dash_position, comma_position, second_dash_position
-        //);
 
         let first_inter_begin: u32 = cur_line[..first_dash_position].parse().unwrap();
         let first_inter_end: u32 = cur_line
@@ -258,10 +249,6 @@ fn move_crates_multiple(crates_vec: &mut Vec<Vec<u8>>, actions: &Vec<CrateAction
             .drain((from_stack_len - cur_action.nr_of_crates)..from_stack_len)
             .collect();
         crates_vec[cur_action.to_stack].append(&mut stack_part);
-        //for _ in 0..cur_action.nr_of_crates {
-        //    let tmp0 = crates_vec[cur_action.from_stack].pop().unwrap();
-        //    crates_vec[cur_action.to_stack].push(tmp0);
-        //}
     }
     println!("Stack heads: ");
     for a_stack in crates_vec {
@@ -334,15 +321,13 @@ fn get_crate_stacks_actions(in_content: String) -> (Vec<Vec<u8>>, Vec<CrateActio
 }
 
 pub fn d5_p1() {
-    //let in_content = std::fs::read_to_string("./in/d5p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d5p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d5p1/input").unwrap(); // for testing quickly "./in/d5p1/tmp_in"
     let mut crates_and_actions = get_crate_stacks_actions(in_content);
     move_crates_single(&mut crates_and_actions.0, &crates_and_actions.1);
 }
 
 pub fn d5_p2() {
-    //let in_content = std::fs::read_to_string("./in/d5p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d5p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d5p2/input").unwrap(); // WARNING this was opening "./in/d5p1/input" need to check if it is working or not
     let mut crates_and_actions = get_crate_stacks_actions(in_content);
     move_crates_multiple(&mut crates_and_actions.0, &crates_and_actions.1);
 }

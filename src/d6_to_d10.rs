@@ -1,8 +1,7 @@
 use std::collections::BTreeSet;
 
 pub fn d6_p1() {
-    //let in_content = std::fs::read_to_string("./in/d6p1/tmp_in4").unwrap();
-    let in_content = std::fs::read_to_string("./in/d6p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d6p1/input").unwrap(); // for testing quickly "./in/d6p1/tmp_in4"
     let mut end_index = 4;
     let mut cur_four_bytes = Vec::<u8>::from(&in_content[0..end_index]);
     let mut uniques: BTreeSet<u8> = BTreeSet::new();
@@ -18,8 +17,7 @@ pub fn d6_p1() {
 }
 
 pub fn d6_p2() {
-    //let in_content = std::fs::read_to_string("./in/d6p1/tmp_in4").unwrap();
-    let in_content = std::fs::read_to_string("./in/d6p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d6p1/input").unwrap(); // for testing quickly "./in/d6p1/tmp_in4"
     const WINDOW_SIZE: usize = 14;
     let mut end_index = WINDOW_SIZE;
     let mut cur_four_bytes = Vec::<u8>::from(&in_content[0..end_index]);
@@ -172,8 +170,7 @@ fn get_directory_sizes(dir_structure: Vec<ElfDir>) -> Vec<u32> {
 }
 
 pub fn d7_p1() {
-    //let in_content = std::fs::read_to_string("./in/d7p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d7p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d7p1/input").unwrap(); // for testing quickly "./in/d7p1/tmp_in"
     let all_dirs = build_dir_structure(&in_content);
     let sum_of_under_100000: u32 = get_directory_sizes(all_dirs)
         .iter()
@@ -188,8 +185,7 @@ pub fn d7_p1() {
 pub fn d7_p2() {
     const TOTAL_DISK_SPACE: u32 = 70000000;
     const NEEDED_UNUSED_SPACE: u32 = 30000000;
-    //let in_content = std::fs::read_to_string("./in/d7p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d7p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d7p1/input").unwrap(); // for testing quickly "./in/d7p1/tmp_in"
     let all_dirs = build_dir_structure(&in_content);
     let current_directory_sizes = get_directory_sizes(all_dirs);
     let currently_used: u32 = current_directory_sizes[0];
@@ -207,8 +203,7 @@ pub fn d7_p2() {
 }
 
 pub fn d8_p1() {
-    //let in_content = std::fs::read_to_string("./in/d8p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d8p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d8p1/input").unwrap(); // for testing quickly "./in/d8p1/tmp_in"
     let mut tree_grid: Vec<Vec<char>> = Vec::new();
     for cur_line in in_content.lines() {
         tree_grid.push(Vec::new());
@@ -258,8 +253,7 @@ pub fn d8_p1() {
 }
 
 pub fn d8_p2() {
-    //let in_content = std::fs::read_to_string("./in/d8p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d8p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d8p1/input").unwrap(); // for testing quickly "./in/d8p1/tmp_in"
     let mut tree_grid: Vec<Vec<char>> = Vec::new();
     for cur_line in in_content.lines() {
         tree_grid.push(Vec::new());
@@ -317,13 +311,6 @@ pub fn d8_p2() {
             if cur_score > max_score {
                 max_score = cur_score;
             }
-            //if !vertically_invisible1
-            //    || !vertically_invisible2
-            //    || !horizontally_invisible1
-            //    || !horizontally_invisible2
-            //{
-            //    nr_of_visible += 1;
-            //}
         }
     }
     println!("Maximum scenic score: {}", max_score);
@@ -362,8 +349,7 @@ fn update_rope_tail(
 }
 
 pub fn d9_p1() {
-    //let in_content = std::fs::read_to_string("./in/d9p1/tmp_in").unwrap();
-    let in_content = std::fs::read_to_string("./in/d9p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d9p1/input").unwrap(); // for testing quickly "./in/d9p1/tmp_in"
 
     let mut cur_head_pos: (i32, i32) = (0, 0);
     let mut cur_tail_pos: (i32, i32) = (0, 0);
@@ -425,12 +411,6 @@ fn update_the_entire_rope(in_rope: &mut Vec<(i32, i32)>, tail_history: &mut BTre
                 } else {
                     -1
                 };
-                //println!(
-                //    " {} is moving by ({}, {})",
-                //    i + 1,
-                //    hori_direction,
-                //    vert_direction
-                //);
                 cur_tail_pos.0 += hori_direction;
                 cur_tail_pos.1 += vert_direction;
                 if i == in_rope.len() - 2 {
@@ -442,8 +422,7 @@ fn update_the_entire_rope(in_rope: &mut Vec<(i32, i32)>, tail_history: &mut BTre
     }
 }
 pub fn d9_p2() {
-    //let in_content = std::fs::read_to_string("./in/d9p1/tmp_in1").unwrap();
-    let in_content = std::fs::read_to_string("./in/d9p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d9p1/input").unwrap(); // for testing quickly "./in/d9p1/tmp_in1"
 
     let mut rope: Vec<(i32, i32)> = vec![(0, 0); 10];
     let mut tail_pos_history: BTreeSet<(i32, i32)> = BTreeSet::new();
@@ -490,7 +469,6 @@ fn get_regx_history(in_content: &str) -> Vec<i32> {
     while !(add_queue.len() == 0 && current_state == CpuState::Idle) {
         match current_state {
             CpuState::Idle => {
-                //println!("Cycle: {} , Idle, Add queue: {:?}", cycle_num, add_queue);
                 x_history.push(current_x);
                 let next_instr = add_queue.pop();
                 if let Some(Some(val)) = next_instr {
@@ -499,10 +477,6 @@ fn get_regx_history(in_content: &str) -> Vec<i32> {
                 cycle_num += 1;
             }
             CpuState::ExecAdd(cur_step, max_step, value) => {
-                //println!(
-                //    "Cycle {} Executing add {} x value: {}, add queue: {:?}",
-                //    cycle_num, value, current_x, add_queue
-                //);
                 x_history.push(current_x);
                 if cur_step < max_step {
                     current_state = CpuState::ExecAdd(cur_step + 1, max_step, value);
@@ -523,8 +497,7 @@ fn get_regx_history(in_content: &str) -> Vec<i32> {
 }
 
 pub fn d10_p1() {
-    //let in_content = std::fs::read_to_string("./in/d10p1/tmp_in1").unwrap();
-    let in_content = std::fs::read_to_string("./in/d10p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d10p1/input").unwrap(); // for testing quickly "./in/d10p1/tmp_in1"
     let x_history = get_regx_history(&in_content);
 
     let mut sum_of_sstrengths = 0;
@@ -548,8 +521,7 @@ fn display_crt_buffer(in_crt_buffer: Vec<Vec<char>>) -> String {
 }
 
 pub fn d10_p2() {
-    //let in_content = std::fs::read_to_string("./in/d10p1/tmp_in1").unwrap();
-    let in_content = std::fs::read_to_string("./in/d10p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d10p1/input").unwrap(); // for testing quickly "./in/d10p1/tmp_in1"
     let x_history = get_regx_history(&in_content);
     let mut crt_display_buffer: Vec<Vec<char>> = vec![vec!['?'; 40]; 6];
     for i in 0..crt_display_buffer.len() {

@@ -1,9 +1,7 @@
+use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::collections::VecDeque;
 use std::fmt::Debug;
-use std::fs::read_to_string;
-use std::ops::Add;
-use std::ops::Mul;
 
 #[derive(Debug, PartialEq, Clone)]
 enum MonkeyOperation {
@@ -227,7 +225,7 @@ fn parse_monkey_states(in_content: &str) -> Vec<MonkeyState> {
 
 fn simulate_monkey_actions_p1(monkey_states: &mut Vec<MonkeyState>, nr_of_states: usize) {
     let mut monkey_activeness: Vec<u64> = vec![0; monkey_states.len()];
-    for cur_step in 0..nr_of_states {
+    for _ in 0..nr_of_states {
         for cur_monkey_ind in 0..monkey_states.len() {
             while monkey_states[cur_monkey_ind].items.len() > 0 {
                 monkey_activeness[cur_monkey_ind] += 1;
@@ -251,7 +249,7 @@ fn simulate_monkey_actions_p1(monkey_states: &mut Vec<MonkeyState>, nr_of_states
 
 fn simulate_monkey_actions_p2(monkey_states: &mut Vec<MonkeyStateP2>, nr_of_states: usize) {
     let mut monkey_activeness: Vec<u64> = vec![0; monkey_states.len()];
-    for cur_step in 0..nr_of_states {
+    for _ in 0..nr_of_states {
         for cur_monkey_ind in 0..monkey_states.len() {
             while monkey_states[cur_monkey_ind].items.len() > 0 {
                 monkey_activeness[cur_monkey_ind] += 1;
@@ -273,16 +271,14 @@ fn simulate_monkey_actions_p2(monkey_states: &mut Vec<MonkeyStateP2>, nr_of_stat
 }
 
 pub fn d11_p1() {
-    //let in_content = std::fs::read_to_string("./in/d11p1/tmp_in0").unwrap();
-    let in_content = std::fs::read_to_string("./in/d11p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d11p1/input").unwrap(); // for testing quickly "./in/d11p1/tmp_in0"
     let mut monkeys_states = parse_monkey_states(&in_content);
     simulate_monkey_actions_p1(&mut monkeys_states, 20);
 }
 
 pub fn d11_p2() {
-    //let in_content = std::fs::read_to_string("./in/d11p1/tmp_in0").unwrap();
-    let in_content = std::fs::read_to_string("./in/d11p1/input").unwrap();
-    let mut monkeys_states = parse_monkey_states(&in_content);
+    let in_content = std::fs::read_to_string("./in/d11p1/input").unwrap(); // for testing quickly  "./in/d11p1/tmp_in0"
+    let monkeys_states = parse_monkey_states(&in_content);
     let mut monkeys_states_p2: Vec<MonkeyStateP2> = monkeys_states
         .iter()
         .map(|x| convert_to_p2_repr(x))
@@ -366,69 +362,6 @@ fn get_p1_valid_neighbors(in_map: &Vec<Vec<u8>>, in_pos: (usize, usize)) -> Vec<
         }
     }
     valid_neighbors
-    //vec![valid_neighbors
-    //    .iter()
-    //    .map(|x| (x, in_map[x.0][x.1]))
-    //    .max_by(|&x, &y| y.1.cmp(&x.1))
-    //    .map(|x| x.0)
-    //    .unwrap()
-    //    .clone()]
-}
-
-fn get_p1_nr_of_steps(in_map_info: &HeightMapInfo) -> Option<u32> {
-    let mut visited_set: BTreeSet<(usize, usize)> = BTreeSet::new();
-    //let mut next_visit_deque: VecDeque<(usize, usize, u32, BTreeSet<(usize, usize)>)> =
-    //    VecDeque::new();
-    let mut next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
-    let mut has_reached_to_target = false;
-    let mut path_length = None;
-    next_visit_deque.push_back((in_map_info.start_x, in_map_info.start_y, 0));
-    while !has_reached_to_target && !next_visit_deque.is_empty() {
-        let cur_node = next_visit_deque.pop_front().unwrap();
-        //let cur_node = next_visit_deque.pop_back().unwrap();
-        //println!("Inspecting: {:?}", cur_node);
-        visited_set.insert((cur_node.0, cur_node.1));
-        if cur_node.0 == in_map_info.end_x && cur_node.1 == in_map_info.end_y {
-            path_length = Some(cur_node.2);
-            has_reached_to_target = true;
-        } else {
-            let valid_neighbors =
-                get_p1_valid_neighbors(&in_map_info.map, (cur_node.0, cur_node.1));
-            let mut next_targets: VecDeque<(usize, usize, u32)> = valid_neighbors
-                .iter()
-                .filter(|x| !visited_set.contains(&x))
-                //.filter(|x| {
-                //    let mut long_path = false;
-                //    if let Some(val) = path_length {
-                //        if val < cur_node.3.len() as u32 {
-                //            long_path = true
-                //        }
-                //    }
-                //    !cur_node.3.contains(&x) && !long_path
-                //})
-                //.map(|&x| {
-                //    let mut path = cur_node.3.clone();
-                //    path.insert((x.0, x.1));
-                //    (x.0, x.1, cur_node.2 + 1, path)
-                //})
-                .map(|&x| (x.0, x.1, cur_node.2 + 1))
-                .collect();
-            next_visit_deque.append(&mut next_targets);
-            const VEC_LIMIT: usize = 100000000;
-            let mut pruned_next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
-            if next_visit_deque.len() > VEC_LIMIT {
-                panic!("next visit dequeue has more than {} elements", VEC_LIMIT);
-            }
-            for next_visit_node in next_visit_deque {
-                if !visited_set.contains(&(next_visit_node.0, next_visit_node.1)) {
-                    pruned_next_visit_deque.push_back(next_visit_node.clone());
-                }
-            }
-            next_visit_deque = pruned_next_visit_deque;
-        }
-    }
-    //println!("path: {:?}", found_path);
-    path_length
 }
 
 fn p1_nr_of_steps(
@@ -439,39 +372,21 @@ fn p1_nr_of_steps(
     end_y: usize,
 ) -> Option<u32> {
     let mut visited_set: BTreeSet<(usize, usize)> = BTreeSet::new();
-    //let mut next_visit_deque: VecDeque<(usize, usize, u32, BTreeSet<(usize, usize)>)> =
-    //    VecDeque::new();
     let mut next_visit_deque: VecDeque<(usize, usize, u32)> = VecDeque::new();
     let mut has_reached_to_target = false;
     let mut path_length = None;
     next_visit_deque.push_back((start_x, start_y, 0));
     while !has_reached_to_target && !next_visit_deque.is_empty() {
         let cur_node = next_visit_deque.pop_front().unwrap();
-        //let cur_node = next_visit_deque.pop_back().unwrap();
-        //println!("Inspecting: {:?}", cur_node);
         visited_set.insert((cur_node.0, cur_node.1));
         if cur_node.0 == end_x && cur_node.1 == end_y {
             path_length = Some(cur_node.2);
             has_reached_to_target = true;
         } else {
-            let mut valid_neighbors = get_p1_valid_neighbors(&map, (cur_node.0, cur_node.1));
+            let valid_neighbors = get_p1_valid_neighbors(&map, (cur_node.0, cur_node.1));
             let mut next_targets: VecDeque<(usize, usize, u32)> = valid_neighbors
                 .iter()
                 .filter(|x| !visited_set.contains(&x))
-                //.filter(|x| {
-                //    let mut long_path = false;
-                //    if let Some(val) = path_length {
-                //        if val < cur_node.3.len() as u32 {
-                //            long_path = true
-                //        }
-                //    }
-                //    !cur_node.3.contains(&x) && !long_path
-                //})
-                //.map(|&x| {
-                //    let mut path = cur_node.3.clone();
-                //    path.insert((x.0, x.1));
-                //    (x.0, x.1, cur_node.2 + 1, path)
-                //})
                 .map(|&x| (x.0, x.1, cur_node.2 + 1))
                 .collect();
             next_visit_deque.append(&mut next_targets);
@@ -488,7 +403,6 @@ fn p1_nr_of_steps(
             next_visit_deque = pruned_next_visit_deque;
         }
     }
-    //println!("path: {:?}", found_path);
     path_length
 }
 fn one_hop_targets(
@@ -563,23 +477,6 @@ fn path_from_subpaths(
     map_info: &HeightMapInfo,
     subpaths: &Vec<Vec<((usize, usize), (usize, usize))>>,
 ) {
-    //let mut subpath_lengths: Vec<Vec<Vec<Option<u32>>>> = Vec::new();
-    //for same_height_subpaths_ind in 0..subpaths.len()-1 {
-    //    let from_subpaths = &subpaths[same_height_subpaths_ind];
-    //    let to_subpaths = &subpaths[same_height_subpaths_ind+1];
-    //    let mut cur_path_lengths: Vec<Vec<Option<u32>>> = vec![vec![None; to_subpaths.len()]; from_subpaths.len()];
-    //    for (i, src_path) in from_subpaths.iter().enumerate() {
-    //        for (j,dst_path) in to_subpaths.iter().enumerate() {
-    //            println!("Will check the path between: {:?} and {:?}", src_path.1 , dst_path.0);
-
-    //                cur_path_lengths[i][j] = get_p1_nr_of_steps(&HeightMapInfo {
-    //                    map: map_info.map.clone(), start_x: src_path.1.0, start_y: src_path.1.1,
-    //                    end_x: dst_path.0.0, end_y: dst_path.0.1 })
-    //        }
-    //    }
-    //    subpath_lengths.push(cur_path_lengths);
-    //}
-    //println!("Built a 3d path lengts vector");
     let mut found_path_lens: Vec<u32> = Vec::new();
     let mut subpath_index = vec![0usize; subpaths.len()];
     while let Ok(()) = vec2d_next_index(&subpaths, &mut subpath_index) {
@@ -631,7 +528,6 @@ fn path_from_subpaths(
             }
         }
     }
-    //println!("Subpath lengths: {:?}", subpath_lengths);
     println!("Found path lengths: {:?}", found_path_lens);
 }
 
@@ -661,8 +557,7 @@ fn vec2d_next_index<T>(in_vec: &Vec<Vec<T>>, index_vec: &mut Vec<usize>) -> Resu
 }
 
 pub fn d12_p1() {
-    //let in_content = std::fs::read_to_string("./in/d12p1/tmp_in0").unwrap();
-    let in_content = std::fs::read_to_string("./in/d12p1/input").unwrap();
+    let in_content = std::fs::read_to_string("./in/d12p1/input").unwrap(); // for testing quickly "./in/d12p1/tmp_in0"
     let map_info = parse_height_map(&in_content);
     let found_path = p1_nr_of_steps(
         &map_info.map,
@@ -672,14 +567,9 @@ pub fn d12_p1() {
         map_info.end_y,
     );
     println!("found path length: {:?}", found_path);
-    //let subpaths = necessary_subpaths(&map_info);
-    //path_from_subpaths(&map_info, &subpaths);
-    //let path_length = get_p1_nr_of_steps(&map_info);
-    // println!("path length: {}", path_length);
 }
 
 fn path_len_from_selected_height(map_info: &HeightMapInfo, selected_height: u8) -> Option<u32> {
-    let start_points: Vec<(usize, usize)> = Vec::new();
     let mut min_path_len = u32::max_value();
     for i in 0..map_info.map.len() {
         for j in 0..map_info.map[i].len() {
